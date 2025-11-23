@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+build/
+*.spec
+venv/
+.vscode/
+.idea/
+.DS_Store
+*.log
+!server/dist/AI-Typer-Helper.exe

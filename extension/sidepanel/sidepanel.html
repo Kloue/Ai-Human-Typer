@@ -1,161 +1,315 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AI Typer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Human Typer</title>
   <link rel="stylesheet" href="sidepanel.css">
 </head>
 <body>
   <div class="container">
+    <!-- Header -->
     <div class="header">
-      <h1>🤖 AI Typer</h1>
-      <button id="info-button" class="info-btn" title="About this extension">ℹ️ About</button>
-      <p class="version">v1.0.0</p>
+      <h1>🤖 AI Human Typer</h1>
+      <p class="subtitle">Bypass AI detection with realistic typing</p>
+      <p class="version">v1.2.0 - by Kloue - 2025-11-23 14:04:58</p>
     </div>
-    
-    <div class="shortcuts-info">
-      <strong>⌨️ Keyboard Shortcuts:</strong><br>
-      <div class="shortcut-item">
-        <code>Ctrl+Shift+Space</code>
-        <span>Start/Pause/Resume</span>
+
+    <!-- Site Detection Notice -->
+    <div id="site-notice" class="site-notice" style="display: none;">
+      <h3 id="site-type-title">🌐 Site Detected</h3>
+      <p id="site-type-message"></p>
+    </div>
+
+    <!-- Python Server Status (google docs only) -->
+    <div class="python-server-section" id="python-section" style="display: none;">
+      <h3>🐍 Python Server Required</h3>
+      <div id="server-status" class="server-status offline">
+        <p>❌ Checking connection...</p>
       </div>
-      <div class="shortcut-item">
-        <code>Ctrl+Shift+X</code>
-        <span>Stop completely</span>
-      </div>
-      <div class="shortcut-item">
-        <code>Ctrl+Shift+P</code>
-        <span>Toggle panel</span>
-      </div>
-      <div class="shortcut-item">
-        <code>~</code>
-        <span>Debug panel</span>
+      
+      <button id="download-helper" class="download-btn" style="display: none;">
+        📥 Download AI Typer Helper.exe
+      </button>
+      
+      <div class="instructions" style="display: none;" id="download-instructions">
+        <p><strong>Why do I need this?</strong></p>
+        <p>Google Docs blocks direct typing. Python helper uses OS-level keyboard simulation to bypass this.</p>
+        <p><strong>Setup:</strong></p>
+        <ol>
+          <li>Download the .exe file</li>
+          <li>Run it (allow Windows Defender)</li>
+          <li>Server starts in system tray (🤖)</li>
+          <li>Refresh this page</li>
+        </ol>
       </div>
     </div>
-    
-    <div class="api-section">
-      <h3>🔑 OpenAI API Key (Optional)</h3>
-      <div class="api-input-group">
-        <input type="password" id="api-key" placeholder="sk-proj-...">
-        <button id="clear-api-key" class="clear-api-btn" title="Clear API key">✕</button>
+
+    <!-- Cursor Control Consent (first time only) -->
+    <div id="consent-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h2>⚠️ CURSOR CONTROL PERMISSION</h2>
+        
+        <div class="consent-info">
+          <p><strong>AI Human Typer needs permission to:</strong></p>
+          <ul>
+            <li>✅ Control your mouse cursor (Google Docs mode only)</li>
+            <li>✅ Automatically click to fix errors</li>
+            <li>✅ Move cursor to correct positions</li>
+            <li>✅ Verify and correct typed text</li>
+          </ul>
+          
+          <p><strong>Why?</strong></p>
+          <p>If focus is lost or text gets corrupted, the extension will automatically fix it.</p>
+          
+          <p class="warning">⚠️ <strong>Important:</strong> Don't touch mouse/keyboard during typing!</p>
+          
+          <p class="info">Your typing will be monitored and auto-corrected in real-time for max accuracy.</p>
+        </div>
+        
+        <div class="consent-checkbox">
+          <input type="checkbox" id="consent-check">
+          <label for="consent-check">I understand and give permission for cursor control</label>
+        </div>
+        
+        <div class="consent-actions">
+          <button id="consent-accept" class="btn-primary" disabled>✅ Accept & Start Typing</button>
+          <button id="consent-cancel" class="btn-secondary">❌ Cancel</button>
+        </div>
       </div>
-      <button id="save-api-key" class="save-btn">💾 Save Key</button>
-      <p id="api-status" class="status-message"></p>
-      <p class="hint">✨ With AI: Enhanced word speed + smarter patterns<br>
-      ⚡ Without AI: Smart rule-based typing (still awesome!)</p>
     </div>
-    
-    <div class="field-status">
-      <h3>📍 Target Field</h3>
-      <p id="field-status">No field selected</p>
-      <button id="select-field" class="select-btn">🎯 Click to Select Field</button>
-      <p class="hint">💡 Click the button, then click on any text field</p>
+
+    <!-- Recovery Modal (focus lost) -->
+    <div id="recovery-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h2>⚠️ TYPING INTERRUPTED</h2>
+        
+        <div class="recovery-info">
+          <p><strong>Focus lost or cursor moved!</strong></p>
+          <p>Stopped at: <span id="recovery-position">0</span> / <span id="recovery-total">0</span> chars</p>
+          <p>Progress: <span id="recovery-percentage">0%</span></p>
+        </div>
+        
+        <div class="recovery-preview">
+          <div class="typed-preview">
+            <label>✅ Already typed:</label>
+            <div id="typed-text" class="preview-text"></div>
+          </div>
+          
+          <div class="remaining-preview">
+            <label>⏭️ Remaining:</label>
+            <div id="remaining-text" class="preview-text"></div>
+          </div>
+        </div>
+        
+        <div class="recovery-instructions">
+          <p><strong>What to do:</strong></p>
+          <ol id="recovery-instructions-list">
+            <li>Click back in text field</li>
+            <li>Position cursor at end of typed text</li>
+            <li>Click "Resume" below</li>
+          </ol>
+        </div>
+        
+        <div class="recovery-actions">
+          <button id="resume-btn" class="btn-primary">
+            ▶️ Resume from position <span id="resume-pos">0</span>
+          </button>
+          <button id="restart-btn" class="btn-secondary">
+            🔄 Restart from beginning
+          </button>
+          <button id="stop-recovery-btn" class="btn-danger">
+            ⏹️ Stop completely
+          </button>
+        </div>
+      </div>
     </div>
-    
-    <div class="settings">
+
+    <!-- Paragraph Break Modal -->
+    <div id="paragraph-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h2>📄 PARAGRAPH BREAK</h2>
+        
+        <div class="paragraph-info">
+          <p><strong>Completed paragraph <span id="para-current">1</span> of <span id="para-total">5</span></strong></p>
+          <p>Progress: <span id="para-percentage">40%</span></p>
+          <p><span id="para-chars">80 / 200</span> characters done</p>
+        </div>
+        
+        <div class="paragraph-status">
+          <p>⏸️ Paused at paragraph break</p>
+          <p class="hint">Take a moment to review the typed text</p>
+        </div>
+        
+        <div class="paragraph-actions">
+          <button id="para-continue-btn" class="btn-primary">
+            ▶️ Continue Typing
+          </button>
+          <button id="para-stop-btn" class="btn-danger">
+            ⏹️ Stop Here
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Correction Notice (auto-fix in progress) -->
+    <div id="correction-notice" class="notice" style="display: none;">
+      <h4>🔧 Auto-Correcting Error...</h4>
+      <p id="correction-message"></p>
+    </div>
+
+    <!-- Text Input Section -->
+    <div class="section">
+      <h3>📝 Text to Type</h3>
+      
+      <div id="text-locked-warning" class="warning-banner" style="display: none;">
+        🔒 Text locked while typing. Stop to edit.
+      </div>
+      
+      <textarea 
+        id="input-text" 
+        placeholder="Paste your essay or text here..."
+        rows="8"
+      ></textarea>
+      
+      <div class="char-counter">
+        Characters: <span id="char-count">0</span> | 
+        Paragraphs: <span id="para-count">0</span>
+      </div>
+    </div>
+
+    <!-- Typing Settings -->
+    <div class="section">
       <h3>⚙️ Typing Settings</h3>
       
-      <div class="setting-group">
-        <label for="wpm">
-          <span class="label-text">WPM (Words Per Minute)</span>
-          <span id="wpm-value" class="value-display">60</span>
-        </label>
-        <input type="range" id="wpm" min="20" max="120" value="60" step="5">
-        <div class="range-labels">
-          <span>20</span>
-          <span>120</span>
-        </div>
-      </div>
+      <p class="live-update-indicator" id="live-indicator" style="display: none;">
+        ✏️ Changes apply in real-time while typing!
+      </p>
       
-      <div class="setting-group">
+      <div class="setting">
+        <label for="wpm">
+          WPM (Words Per Minute): 
+          <span id="wpm-value">60</span>
+          <span id="wpm-live" class="live-badge" style="display: none;">LIVE</span>
+        </label>
+        <input type="range" id="wpm" min="30" max="120" value="60" step="5">
+        <p class="hint">💡 Recommended: 60-80 for natural typing</p>
+      </div>
+
+      <div class="setting">
         <label for="variance">
-          <span class="label-text">Speed Variance</span>
-          <span id="variance-value" class="value-display">20%</span>
+          Speed Variance: 
+          <span id="variance-value">20%</span>
+          <span id="variance-live" class="live-badge" style="display: none;">LIVE</span>
         </label>
         <input type="range" id="variance" min="0" max="50" value="20" step="5">
-        <div class="range-labels">
-          <span>0%</span>
-          <span>50%</span>
-        </div>
+        <p class="hint">💡 Higher = more random speed changes</p>
       </div>
-      
-      <div class="setting-group">
+
+      <div class="setting">
         <label for="mistake-rate">
-          <span class="label-text">Mistake Rate</span>
-          <span id="mistake-rate-value" class="value-display">5%</span>
+          Mistake Rate: 
+          <span id="mistake-rate-value">5%</span>
+          <span id="mistake-live" class="live-badge" style="display: none;">LIVE</span>
         </label>
-        <input type="range" id="mistake-rate" min="0" max="20" value="5" step="1">
-        <div class="range-labels">
-          <span>0%</span>
-          <span>20%</span>
-        </div>
+        <input type="range" id="mistake-rate" min="0" max="15" value="5" step="1">
+        <p class="hint">💡 Realistic: 3-7% mistakes</p>
       </div>
-      
-      <div class="checkbox-group">
-        <label class="checkbox-label">
-          <input type="checkbox" id="thinking-pause" checked>
-          <span>Thinking Pauses (3-10 sec)</span>
+
+      <div class="setting">
+        <label for="paragraph-breaks">
+          Break After Every:
         </label>
-        
-        <label class="checkbox-label">
-          <input type="checkbox" id="self-correction" checked>
-          <span>Self-Corrections</span>
-        </label>
-        
-        <label class="checkbox-label">
-          <input type="checkbox" id="human-pauses" checked>
-          <span>Smart Break Prompts</span>
-        </label>
+        <select id="paragraph-breaks">
+          <option value="0">Never</option>
+          <option value="1">1 paragraph</option>
+          <option value="2" selected>2 paragraphs</option>
+          <option value="3">3 paragraphs</option>
+          <option value="5">5 paragraphs</option>
+        </select>
+        <p class="hint">💡 Pause between paragraphs to review</p>
+      </div>
+
+      <div class="checkbox-setting">
+        <input type="checkbox" id="thinking-pause" checked>
+        <label for="thinking-pause">💭 Thinking Pauses (at punctuation)</label>
+      </div>
+
+      <div class="checkbox-setting">
+        <input type="checkbox" id="self-correction" checked>
+        <label for="self-correction">🔧 Self-Correction (backspace to fix typos)</label>
+      </div>
+
+      <!-- AI Enhancement (UI only, not implemented) -->
+      <div class="checkbox-setting ai-enhancement">
+        <input type="checkbox" id="ai-enhanced">
+        <label for="ai-enhanced">🤖 AI Enhancement (Coming Soon)</label>
+      </div>
+      <div class="ai-info" style="display: none;" id="ai-info">
+        <p class="hint">✨ AI-powered features (not yet implemented):</p>
+        <ul class="ai-features-list">
+          <li>Context-aware typing speed</li>
+          <li>Intelligent pause prediction</li>
+          <li>Natural error patterns</li>
+          <li>Adaptive rhythm learning</li>
+        </ul>
       </div>
     </div>
-    
-    <div class="text-input">
-      <h3>📝 Text to Type</h3>
-      <textarea id="input-text" placeholder="Enter the text you want to type here..."></textarea>
-      <div class="char-count">
-        <span id="char-count">0</span> characters
-      </div>
-    </div>
-    
-    <div class="progress-section" id="progress-section" style="display: none;">
+
+    <!-- Progress Section -->
+    <div class="section" id="progress-section" style="display: none;">
       <h3>📊 Progress</h3>
       <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
+        <div class="progress-fill" id="progress-fill">
+          <span id="progress-bar-text"></span>
+        </div>
       </div>
       <p class="progress-text">
         <span id="progress-percentage">0%</span> - 
         <span id="progress-chars">0 / 0</span> characters
       </p>
+      <p class="progress-text" id="progress-paragraph" style="display: none;">
+        Paragraph: <span id="progress-para">1 / 5</span>
+      </p>
+      <p class="progress-text" id="progress-time" style="display: none;">
+        ⏱️ Time remaining: <span id="time-remaining">--</span>
+      </p>
     </div>
-    
-    <div class="actions">
-      <button id="start-typing" class="primary">
-        <span class="btn-icon">▶️</span>
-        <span id="start-btn-text">Start Typing</span>
+
+    <!-- Control Buttons -->
+    <div class="controls">
+      <button id="start-typing" class="btn-primary">
+        ▶️ Start Typing
       </button>
-      <button id="stop-typing" class="secondary">
-        <span class="btn-icon">⏹️</span>
-        <span>Stop</span>
+      <button id="pause-typing" class="btn-warning" disabled style="display: none;">
+        ⏸️ Pause
       </button>
-      <button id="reset-typing" class="reset-btn">
-        <span class="btn-icon">🔄</span>
-        <span>Reset All</span>
+      <button id="resume-typing" class="btn-success" disabled style="display: none;">
+        ▶️ Resume
+      </button>
+      <button id="stop-typing" class="btn-danger" disabled>
+        ⏹️ Stop
+      </button>
+      <button id="reset-typing" class="btn-secondary">
+        🔄 Reset All
       </button>
     </div>
-    
-    <div class="status">
-      <div class="status-icon">ℹ️</div>
-      <p id="status-text">Ready to type</p>
+
+    <!-- Status -->
+    <div class="status" id="status-text">
+      Ready to type. Paste your text and configure settings.
     </div>
-    
+
+    <!-- Footer -->
     <div class="footer">
-      <button id="open-debug" class="debug-btn">🐛 Open Debug Panel</button>
-      <p>Made with ❤️ for human-like typing</p>
-      <p class="user-info">User: <strong>Kloue</strong></p>
-      <p class="date-info">2025-01-22</p>
+      <p>Made with ❤️ by <strong>Kloue</strong></p>
+      <p class="date">2025-11-23 14:04:58 UTC</p>
+      <p class="github">⭐ Star on GitHub if you like it!</p>
     </div>
   </div>
-  
+
+  <!-- Scripts -->
+  <script src="../background/python-bridge.js"></script>
   <script src="sidepanel.js"></script>
 </body>
 </html>

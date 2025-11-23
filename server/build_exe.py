@@ -12,12 +12,10 @@ print("This may take a few minutes...")
 PyInstaller.__main__.run([
     'typer_server_gui.py',
     '--onefile',
-    '--noconsole',  # No console window
+    '--noconsole',
     '--name=AI-Typer-Helper',
-    '--icon=icon.ico',  # Optional: add your icon
-    '--add-data=requirements.txt;.',
-    '--hidden-import=pystray',
-    '--hidden-import=PIL',
+    '--hidden-import=pygetwindow',  
+    '--hidden-import=pyperclip',
     '--clean',
 ])
 

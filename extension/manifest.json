@@ -1,43 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "Human-Like AI Typer",
+  "name": "AI Human-Like Typer",
   "version": "1.0.0",
-  "description": "AI-powered typing simulator that mimics human typing patterns",
+  "description": "Simulate human typing to bypass AI detection - Works everywhere!",
   "permissions": [
     "activeTab",
     "storage",
-    "scripting",
-    "sidePanel"
+    "sidePanel",
+    "tabs",
+    "scripting"
   ],
-  "commands": {
-    "toggle-typing": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+Space",
-        "mac": "Command+Shift+Space"
-      },
-      "description": "Start/Pause/Resume typing"
-    },
-    "stop-typing": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+X",
-        "mac": "Command+Shift+X"
-      },
-      "description": "Stop typing completely"
-    },
-    "toggle-panel": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+P",
-        "mac": "Command+Shift+P"
-      },
-      "description": "Toggle side panel"
-    }
-  },
-  "action": {
-    "default_title": "Open AI Typer Panel"
-  },
-  "side_panel": {
-    "default_path": "sidepanel/sidepanel.html"
-  },
+  "host_permissions": [
+    "http://localhost:8765/*",
+    "<all_urls>"
+  ],
   "background": {
     "service_worker": "background/background.js"
   },
@@ -45,20 +21,20 @@
     {
       "matches": ["<all_urls>"],
       "js": [
-        "ai/openai-service.js",
-        "content/typer.js",
-        "content/content.js"
+        "content/site-detector.js",
+        "content/text-verifier.js",
+        "content/content-typer.js"
       ],
       "run_at": "document_idle",
-      "all_frames": true
+      "all_frames": false
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": ["content/injected.js"],
-      "matches": ["<all_urls>"]
-    }
-  ],
+  "action": {
+    "default_title": "Open AI Typer Panel"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/sidepanel.html"
+  },
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

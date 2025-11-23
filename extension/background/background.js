@@ -1,91 +1,61 @@
-chrome.runtime.onInstalled.addListener(() => {
-  console.log('Human-Like AI Typer extension installed');
-  
-  chrome.storage.sync.get(['settings'], (result) => {
-    if (!result.settings) {
-      chrome.storage.sync.set({
-        settings: {
-          wpm: 60,
-          variance: 20,
-          mistakeRate: 5,
-          thinkingPause: true,
-          selfCorrection: true,
-          humanPauses: true
-        }
-      });
-    }
-  });
-});
+/**
+ * Background Service Worker
+ * handles extension lifecycle stuff
+ * 
+ * Kloue - 2025-11-23
+ */
 
-chrome.action.onClicked.addListener(async (tab) => {
-  await chrome.sidePanel.open({ windowId: tab.windowId });
-});
+// side panel setup - open on icon click
+chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error('Side panel error:', error));
 
-chrome.commands.onCommand.addListener(async (command) => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  
-  if (command === 'toggle-panel') {
-    await chrome.sidePanel.open({ windowId: tab.windowId });
-  }
-  
-  if (command === 'toggle-typing') {
-    chrome.storage.local.get(['typingState', 'isCurrentlyTyping'], async (result) => {
-      const isTyping = result.isCurrentlyTyping || false;
-      const typingState = result.typingState;
-      
-      if (typingState && typingState.status === 'PAUSED') {
-        chrome.tabs.sendMessage(tab.id, { action: 'resumeTyping', fromShortcut: true });
-      } else if (isTyping) {
-        chrome.tabs.sendMessage(tab.id, { action: 'pauseTyping', fromShortcut: true });
-      } else {
-        chrome.storage.sync.get(['settings', 'lastText', 'openaiApiKey'], async (result) => {
-          const settings = result.settings || {
-            wpm: 60,
-            variance: 20,
-            mistakeRate: 5,
-            thinkingPause: true,
-            selfCorrection: true,
-            humanPauses: true
-          };
-          
-          const text = result.lastText || '';
-          const apiKey = result.openaiApiKey || null;
-          
-          if (!text) {
-            chrome.tabs.sendMessage(tab.id, {
-              action: 'showNotification',
-              message: '⚠️ No text set! Open side panel to set text first.'
-            });
-            return;
-          }
-          
-          chrome.tabs.sendMessage(tab.id, {
-            action: 'startTyping',
-            text: text,
-            settings: settings,
-            apiKey: apiKey,
-            fromShortcut: true
-          });
-        });
-      }
+// installation handler
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    console.log('🎉 AI Human Typer installed!');
+    console.log('📅 v1.2.0 - Kloue - 2025-11-23');
+    
+    // default settings
+    chrome.storage.sync.set({
+      wpm: 60,
+      variance: 20,
+      mistakeRate: 5,
+      thinkingPause: true,
+      selfCorrection: true,
+      paragraphBreaks: 2,
+      aiEnhanced: false  // not implemented yet
     });
-  }
-  
-  if (command === 'stop-typing') {
-    chrome.tabs.sendMessage(tab.id, { action: 'stopTyping', fromShortcut: true });
+  } else if (details.reason === 'update') {
+    console.log('🔄 Updated to v1.2.0');
   }
 });
 
+// message forwarding between components
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'updateStatus') {
-    chrome.runtime.sendMessage(message).catch(() => {});
+  console.log('📨 Message:', message.type);
+  
+  // forward to side panel
+  switch (message.type) {
+    case 'TYPING_PROGRESS':
+    case 'TYPING_COMPLETE':
+    case 'SHOW_RECOVERY_PROMPT':
+    case 'SHOW_PARAGRAPH_BREAK':
+    case 'SHOW_CORRECTION':
+      forwardToSidePanel(message);
+      break;
   }
   
-  if (message.action === 'setTypingState') {
-    chrome.storage.local.set({ isCurrentlyTyping: message.isTyping });
-  }
-  
-  if (message.action === 'openSidePanel') {
-    chrome.sidePanel.open({ windowId: sender.tab.windowId });
-  }
-}); 
+  return true;
+});
+
+function forwardToSidePanel(message) {
+  // send to panel (might not be open, that's ok)
+  chrome.runtime.sendMessage(message).catch((error) => {
+    // silent fail if panel closed
+    // console.log('Panel not open:', error.message);
+  });
+}
+
+console.log('🤖 Background service worker loaded - v1.2.0');
+console.log('👤 Kloue - 2025-11-23 13:59:29');
