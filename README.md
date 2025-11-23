@@ -1,6 +1,8 @@
 # Ai-Human-Typer
 **Bypass GPTZero and AI detectors by typing text naturally instead of pasting.**
 
+----
+
 ## What It Does
 
 Types your AI-generated essay character-by-character with realistic human patterns:
@@ -11,6 +13,7 @@ Types your AI-generated essay character-by-character with realistic human patter
 
 Resulting in GPTZero, Turnitin, and other AI Detectors using Written Report to check progress to think it's human written.
 
+----
 
 ## Quick Start
 ### 1. Install Extension
@@ -34,6 +37,7 @@ pip install -r requirements.txt
 python build_exe.py
 cd dist
 ./AI-Typer-Helper.exe
+```
 
 ### 3. Use it
 1. Generate essay with ChatGPT
