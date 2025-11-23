@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AI Typer</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🤖 AI Typer</h1>
+      <button id="info-button" class="info-btn" title="About this extension">ℹ️ About</button>
+      <p class="version">v1.0.0</p>
+    </div>
+    
+    <div class="shortcuts-info">
+      <strong>⌨️ Keyboard Shortcuts:</strong><br>
+      <div class="shortcut-item">
+        <code>Ctrl+Shift+Space</code>
+        <span>Start/Pause/Resume</span>
+      </div>
+      <div class="shortcut-item">
+        <code>Ctrl+Shift+X</code>
+        <span>Stop completely</span>
+      </div>
+      <div class="shortcut-item">
+        <code>Ctrl+Shift+P</code>
+        <span>Toggle panel</span>
+      </div>
+      <div class="shortcut-item">
+        <code>~</code>
+        <span>Debug panel</span>
+      </div>
+    </div>
+    
+    <div class="api-section">
+      <h3>🔑 OpenAI API Key (Optional)</h3>
+      <div class="api-input-group">
+        <input type="password" id="api-key" placeholder="sk-proj-...">
+        <button id="clear-api-key" class="clear-api-btn" title="Clear API key">✕</button>
+      </div>
+      <button id="save-api-key" class="save-btn">💾 Save Key</button>
+      <p id="api-status" class="status-message"></p>
+      <p class="hint">✨ With AI: Enhanced word speed + smarter patterns<br>
+      ⚡ Without AI: Smart rule-based typing (still awesome!)</p>
+    </div>
+    
+    <div class="field-status">
+      <h3>📍 Target Field</h3>
+      <p id="field-status">No field selected</p>
+      <button id="select-field" class="select-btn">🎯 Click to Select Field</button>
+      <p class="hint">💡 Click the button, then click on any text field</p>
+    </div>
+    
+    <div class="settings">
+      <h3>⚙️ Typing Settings</h3>
+      
+      <div class="setting-group">
+        <label for="wpm">
+          <span class="label-text">WPM (Words Per Minute)</span>
+          <span id="wpm-value" class="value-display">60</span>
+        </label>
+        <input type="range" id="wpm" min="20" max="120" value="60" step="5">
+        <div class="range-labels">
+          <span>20</span>
+          <span>120</span>
+        </div>
+      </div>
+      
+      <div class="setting-group">
+        <label for="variance">
+          <span class="label-text">Speed Variance</span>
+          <span id="variance-value" class="value-display">20%</span>
+        </label>
+        <input type="range" id="variance" min="0" max="50" value="20" step="5">
+        <div class="range-labels">
+          <span>0%</span>
+          <span>50%</span>
+        </div>
+      </div>
+      
+      <div class="setting-group">
+        <label for="mistake-rate">
+          <span class="label-text">Mistake Rate</span>
+          <span id="mistake-rate-value" class="value-display">5%</span>
+        </label>
+        <input type="range" id="mistake-rate" min="0" max="20" value="5" step="1">
+        <div class="range-labels">
+          <span>0%</span>
+          <span>20%</span>
+        </div>
+      </div>
+      
+      <div class="checkbox-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="thinking-pause" checked>
+          <span>Thinking Pauses (3-10 sec)</span>
+        </label>
+        
+        <label class="checkbox-label">
+          <input type="checkbox" id="self-correction" checked>
+          <span>Self-Corrections</span>
+        </label>
+        
+        <label class="checkbox-label">
+          <input type="checkbox" id="human-pauses" checked>
+          <span>Smart Break Prompts</span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="text-input">
+      <h3>📝 Text to Type</h3>
+      <textarea id="input-text" placeholder="Enter the text you want to type here..."></textarea>
+      <div class="char-count">
+        <span id="char-count">0</span> characters
+      </div>
+    </div>
+    
+    <div class="progress-section" id="progress-section" style="display: none;">
+      <h3>📊 Progress</h3>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <p class="progress-text">
+        <span id="progress-percentage">0%</span> - 
+        <span id="progress-chars">0 / 0</span> characters
+      </p>
+    </div>
+    
+    <div class="actions">
+      <button id="start-typing" class="primary">
+        <span class="btn-icon">▶️</span>
+        <span id="start-btn-text">Start Typing</span>
+      </button>
+      <button id="stop-typing" class="secondary">
+        <span class="btn-icon">⏹️</span>
+        <span>Stop</span>
+      </button>
+      <button id="reset-typing" class="reset-btn">
+        <span class="btn-icon">🔄</span>
+        <span>Reset All</span>
+      </button>
+    </div>
+    
+    <div class="status">
+      <div class="status-icon">ℹ️</div>
+      <p id="status-text">Ready to type</p>
+    </div>
+    
+    <div class="footer">
+      <button id="open-debug" class="debug-btn">🐛 Open Debug Panel</button>
+      <p>Made with ❤️ for human-like typing</p>
+      <p class="user-info">User: <strong>Kloue</strong></p>
+      <p class="date-info">2025-01-22</p>
+    </div>
+  </div>
+  
+  <script src="sidepanel.js"></script>
+</body>
+</html>
