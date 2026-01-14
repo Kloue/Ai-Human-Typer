@@ -1,7 +1,7 @@
 # Ai-Human-Typer
 **Bypass GPTZero and AI detectors by typing text naturally instead of pasting.**
 
-----
+
 
 ## What It Does
 
@@ -13,7 +13,7 @@ Types your AI-generated essay character-by-character with realistic human patter
 
 Resulting in GPTZero, Turnitin, and other AI Detectors using Written Report to check progress to think it's human written.
 
-----
+
 
 ## Quick Start
 ### 1. Install Extension
@@ -116,7 +116,7 @@ Will enhance code into an application later forward for no interruption problems
 License
 Educational purposes. Use responsibly.
 
-That's it! Install, paste, type, submit. Simple. 🚀
 
 -------------------------------------------------
 
+Really Buggy, as google docs and such are too restricted and have high security overall. Only a macro works, so basically worse than even normal typing it down. ;-;
